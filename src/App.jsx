@@ -15,13 +15,14 @@ const App = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [messageHoliday, setMessageHoliday] = useState("");
+  const [jokes, setJokes] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
   const barcodeRef = useRef(null);
-  const [animeBackground, setAnimeBackground] = useState(false); // State khusus untuk anime background
+  const [animeBackground, setAnimeBackground] = useState(localStorage.getItem("animeBackground") === "true" ? true : false); // State khusus untuk anime background
   const [customBackground, setCustomBackground] = useState(""); // State khusus untuk anime background
 
   const generateBQR = (event) => {
-    if (event.target.value === "credit") {
+    if (event.target.value === "jokes") {
       setShowMessage(true);
       setTimeout(() => setShowMessage(false), 3000);
     } else {
@@ -170,19 +171,6 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const entryMessage = setTimeout(() => {
-      setShowMessage(true);
-    }, 10000);
-    const exitMessage = setTimeout(() => {
-      setShowMessage(false);
-    }, 15000);
-    return () => {
-      clearTimeout(entryMessage);
-      clearTimeout(exitMessage);
-    };
-  }, []);
-
   // Fetch image data
   useEffect(() => {
     const fetchImage = async () => {
@@ -191,7 +179,6 @@ const App = () => {
         if (!response.ok) throw new Error("Gagal ambil data gambar");
         const data = await response.json();
         setImageData(data);
-        console.log("Image data fetched:", data);
       } catch (err) {
         console.error("Error in fetch image", err);
         setError(err.message);
@@ -204,12 +191,18 @@ const App = () => {
   useEffect(() => {
     if (animeBackground && imageData && imageData.file_url) {
       const getUrl = `https://${imageData?.file_url}`;
+      localStorage.setItem("animeBackground", true);
       setUrlImage(getUrl);
+
+      if (!animeBackground) {
+        localStorage.setItem("animeBackground", false);
+      }
       const myBackground = localStorage.getItem("customBackground");
       if (myBackground) {
         localStorage.setItem("customBackground", ""); // Reset localStorage
       }
     } else if (!animeBackground) {
+      localStorage.setItem("animeBackground", false);
       if (customBackground) {
         setUrlImage(customBackground); // Set custom background
       }
@@ -218,7 +211,6 @@ const App = () => {
       // localStorage.setItem("recentBackground", ""); // Reset localStorage
     }
   }, [animeBackground, imageData?.file_url]);
-  console.log("Setting anime background:", urlImage);
 
   // Fungsi untuk menangani file upload
   const handleImageUpload = (file) => {
@@ -243,46 +235,83 @@ const App = () => {
     }
   }, [customBackground, urlImage]);
 
+  useEffect(() => {
+    const conditionAnimeBg = localStorage.getItem("animeBackground");
+    if (conditionAnimeBg === "true") {
+      console.log({conditionAnimeBg: conditionAnimeBg, ifelse: 1 === 1});
+      setAnimeBackground(1 === 1);
+      setUrlImage(`https://${imageData?.file_url}`);
+    } else if (conditionAnimeBg === "false") {
+      console.log({conditionAnimeBgFalse: conditionAnimeBg, ifelse: !!conditionAnimeBg});
+      setAnimeBackground(1 === 0)
+      setUrlImage("")
+    }
+  }, [])
+
+  // useEffect(() => {}, [])
+
+  useEffect(() => {
+    const jokeFetching = async() => {
+      const response = await fetch("https://candaan-api.vercel.app/api/text/random")
+      const data = await response.json()
+      setJokes(data.data)
+    }
+    jokeFetching()
+  }, []);
+
+  useEffect(() => {
+    const entryMessage = setTimeout(() => {
+      setShowMessage(true);
+    }, 3000);
+    const exitMessage = setTimeout(() => {
+      setShowMessage(false);
+    }, 15000);
+    return () => {
+      clearTimeout(entryMessage);
+      clearTimeout(exitMessage);
+    };
+  }, []);
+
   const Alert = () => (
-    <div role="alert" className="absolute top-0 shadow-lg alert">
+    <section role="alert" className="absolute top-0 shadow-lg alert">
       <img
         src="vite.svg"
         alt="i"
         className="stroke-info h-8 w-8 shrink-0 aspect-[4/3]"
       />
-      <div>
-        <h3 className="font-bold">Pesan dari Developer</h3>
-        <div className="text-xs">
-          Mohon maaf lahir batin dan semoga sehat selalu
-        </div>
-      </div>
+      <main>
+        <h3 className="font-bold">Jokes Bapack2!</h3>
+        <article className="text-xs">
+        {jokes}
+        </article>
+      </main>
       <button
         className="btn btn-sm"
         onClick={() =>
-          window.open(`https://google.com/search?q=fianity`, "_blank")
+          window.open(`https://wa.me/6285190070283`, "_blank")
         }
       >
-        Reply
+        apcb
       </button>
-    </div>
+    </section>
   );
 
   return (
-    <main
-      className="relative flex flex-col items-center justify-around w-full min-h-svh bg-cover rounded-3xl"
+    <section
+      className="relative flex flex-col items-center justify-around w-full bg-cover min-h-svh rounded-3xl"
       style={{ backgroundImage: `url(${onFocus ? "none" : urlImage})` }}
     >
       {showMessage && <Alert />}
       {loading && (
-        <div className="toast">
-          <div className="alert alert-info font-semibold text-[#242424] dark:text-white">
+        <aside className="toast">
+          <h3 className="alert alert-info font-semibold text-[#242424] dark:text-white">
             <span>Loading...</span>
-          </div>
-        </div>
+          </h3>
+        </aside>
       )}
       {error && (
-        <div className="toast">
-          <div className="alert alert-error font-semibold text-[#242424] dark:text-white">
+        <aside className="toast">
+          <main className="alert alert-error font-semibold text-[#242424] dark:text-white">
             <span>Error: {error}</span>
             <button
               onClick={() => setError(null)}
@@ -290,20 +319,20 @@ const App = () => {
             >
               Tutup
             </button>
-          </div>
-        </div>
+          </main>
+        </aside>
       )}
       {messageHoliday && (
-        <div role="alert" className="absolute top-0 shadow-lg alert">
+        <aside role="alert" className="absolute top-0 shadow-lg alert">
           <img
             src="vite.svg"
             alt="i"
             className="stroke-info h-8 w-8 shrink-0 aspect-[4/3]"
           />
-          <div>
+          <main>
             <h3 className="font-bold">{messageHoliday.name}</h3>
-            <div className="text-xs">{messageHoliday.description}</div>
-          </div>
+            <p className="text-xs">{messageHoliday.description}</p>
+          </main>
           <button
             className="btn btn-sm"
             onClick={() =>
@@ -315,18 +344,18 @@ const App = () => {
           >
             See
           </button>
-        </div>
+        </aside>
       )}
       <Analytics />
-      <div className="grid grid-cols-1 md:grid-cols-2 px-12 md:px-20">
-        <h1 className="text-5xl font-bold text-white col-span-2 text-center md:text-7xl md:text-right lg:text-9xl mix-blend-difference">
+      <main className="grid grid-cols-1 px-12 md:grid-cols-2 md:px-20">
+        <h1 className="col-span-2 text-5xl font-bold text-center text-white md:text-7xl md:text-right lg:text-9xl mix-blend-difference">
           Generate Barcode Realtime✨
         </h1>
         <br />
         {inpQR && (
-          <div
+          <main
             ref={barcodeRef}
-            className="col-span-2 grid place-content-center py-4 md:col-span-1 md:col-start-1"
+            className="grid col-span-2 py-4 place-content-center md:col-span-1 md:col-start-1"
           >
             <Barcode
               value={inpQR}
@@ -335,9 +364,9 @@ const App = () => {
               margin={10}
               displayValue={true}
             />
-          </div>
+          </main>
         )}
-        <main className="col-span-2 md:col-span-1 md:col-start-2 mt-0 md:mt-4 grid place-content-center md:place-content-center">
+        <main className="grid col-span-2 mt-0 md:col-span-1 md:col-start-2 md:mt-4 place-content-center md:place-content-center">
           <input
             type="text"
             id="content"
@@ -348,7 +377,7 @@ const App = () => {
             onBlur={() => setOnFocus(false)}
           />
         </main>
-        <main className="col-span-2 md:col-span-1 md:col-start-2 grid place-content-center md:place-content-center">
+        <main className="grid col-span-2 md:col-span-1 md:col-start-2 place-content-center md:place-content-center">
           <button
             className="btn btn-wide mt-7"
             onClick={(e) => {
@@ -360,7 +389,7 @@ const App = () => {
             {isDownloading ? "Sedang Memproses..." : "Download Barcode"}
           </button>
         </main>
-      </div>
+      </main>
       <Setting
         focus={onFocus}
         setFocus={setOnFocus}
@@ -368,8 +397,11 @@ const App = () => {
         setAnimeBackground={setAnimeBackground}
         handleImageUpload={handleImageUpload}
         setRefresh={setRefresh}
+        imageUrl={imageData}
+        setUrlImage={setUrlImage}
+        urlImage={urlImage}
       />
-    </main>
+    </section>
   );
 };
 
