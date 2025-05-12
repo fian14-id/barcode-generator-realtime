@@ -108,8 +108,8 @@ const Setting = ({ setRefresh, animeBackground, setAnimeBackground, handleImageU
                   }
                   }
                 />
-                <button className="swap-on bg-[#242424] dark:bg-white p-1.5 rounded-full text-white dark:text-[#242424]">ON</button>
-                <button className="swap-off bg-[#242424]/10 dark:bg-white/50 p-1.5 rounded-full dark:text-[#242424]">OFF</button>
+                <div className="swap-on bg-[#242424] dark:bg-white p-1.5 rounded-full text-white dark:text-[#242424]">ON</div>
+                <div className="swap-off bg-[#242424]/10 dark:bg-white/50 p-1.5 rounded-full dark:text-[#242424]">OFF</div>
               </label>
               </main>
             </section>
