@@ -272,6 +272,12 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if ("14-5" === `${new Date().getDate()}-${new Date().getMonth()+1}`) {
+      setAnimeBackground(true);
+      setUrlImage(`https://${imageData?.file_url}`);}
+  } ,[])
+
   const Alert = () => (
     <section role="alert" className="absolute top-0 shadow-lg alert">
       <img
@@ -346,6 +352,30 @@ const App = () => {
           </button>
         </aside>
       )}
+      {"14-5" === `${new Date().getDate()}-${new Date().getMonth()+1}` ? (
+        <aside role="alert" className="absolute top-0 shadow-lg alert">
+          <img
+            src="https://fianity.com/favicon.ico"
+            alt="i"
+            className="stroke-info h-8 w-8 shrink-0 aspect-[4/3]"
+          />
+          <main>
+            <h3 className="font-semibold">Hari Ulang Tahun Allifian</h3>
+            <p className="text-xs">hore🥳🥳🥳🙂😐😕</p>
+          </main>
+          <button
+            className="btn btn-sm"
+            onClick={() =>
+              window.open(
+                `https://allifian.me`,
+                "_blank"
+              )
+            }
+          >
+            See
+          </button>
+        </aside>
+      ) : null}
       <Analytics />
       <main className="grid grid-cols-1 px-12 md:grid-cols-2 md:px-20">
         <h1 className="col-span-2 text-5xl font-bold text-center text-white md:text-7xl md:text-right lg:text-9xl mix-blend-difference">
